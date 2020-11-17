@@ -107,10 +107,28 @@ class Sensor:
         self._load_poses()
         self._load_timestamps()
 
+    def load_single(self, index) -> None:
+        """Loads a single sensor file from disk into memory while others
+        are set to an empty data frame.
+
+        All sensor and associated meta data files are traversed in filename order.
+        """
+        self._load_single_data_item(index)
+        self._load_single_pose(index)
+        self._load_single_timestamp(index)
+
     def _load_data(self) -> None:
         self._data = []
         for fp in self._data_structure:
             self._data.append(self._load_data_file(fp))
+
+    def _load_single_data_item(self, index):
+        self._data = []
+        for i, fp in enumerate(self._data_structure):
+            self._data.append(
+                self._load_data_file(fp) if i == index \
+                else pd.DataFrame(columns=["d"]) # Dummy data frame
+            )
 
     def _load_poses(self) -> None:
         self._poses = []
@@ -119,12 +137,32 @@ class Sensor:
             for entry in file_data:
                 self._poses.append(entry)
 
+    def _load_single_pose(self, index):
+        self._poses = []
+        with open(self._poses_structure, 'r') as f:
+            file_data = json.load(f)
+            for i, entry in enumerate(file_data):
+                self._poses.append(
+                    entry if i == index \
+                    else None
+                )
+
     def _load_timestamps(self) -> None:
         self._timestamps = []
         with open(self._timestamps_structure, 'r') as f:
             file_data = json.load(f)
             for entry in file_data:
                 self._timestamps.append(entry)
+
+    def _load_single_timestamp(self, index) -> None:
+        self._timestamps = []
+        with open(self._timestamps_structure, 'r') as f:
+            file_data = json.load(f)
+            for i, entry in enumerate(file_data):
+                self._timestamps.append(
+                    entry if i == index \
+                    else None
+                )
 
     @abstractmethod
     def _load_data_file(self, fp: str) -> None:
