@@ -5,6 +5,7 @@ import os.path
 from typing import List, overload, TypeVar, Dict
 from abc import ABCMeta, abstractmethod
 
+import numpy as np
 import pandas as pd
 from PIL import Image
 from PIL.JpegImagePlugin import JpegImageFile
@@ -269,11 +270,35 @@ class LidarRaw(Lidar):
 
     def __init__(self, directory: str) -> None:
         super().__init__(directory)
-        self._sensor_id = 0
+        self.set_sensor(0)
 
     @property
     def data(self) -> List[pd.DataFrame]:
-        pass # TODO
+        return self._data
+
+    def _load_data_file(self, fp: str) -> DataFrame:
+        df = super()._load_data_file(fp)
+
+        elevation = np.deg2rad(df["elevation"])
+        distance = df["distance"]
+        azimuth_col_corrected = np.deg2rad(df["azimuth_col_corrected"])
+
+        xy_distance = distance * np.cos(elevation)
+        df["x"] = xy_distance * np.sin(azimuth_col_corrected)
+        df["y"] = xy_distance * np.cos(azimuth_col_corrected)
+        df["z"] = distance * np.sin(elevation)
+
+        assert np.allclose(
+            np.linalg.norm(df[["x", "y", "z"]], axis=1),
+            df["distance"]
+        )
+
+        df.rename(columns={"intensity": "i"}, inplace=True)
+        df["i"] = df["i"].astype(np.float64)
+        df = df.assign(d=0)
+        df = df[["x", "y", "z", "i", "d"]]
+
+        return df
 
 class Camera(Sensor):
     @property
