@@ -6,7 +6,7 @@ from .annotations import SemanticSegmentation
 from .meta import GPS
 from .meta import Timestamps
 from .sensors import Camera
-from .sensors import Lidar
+from .sensors import Lidar, LidarRaw
 from .utils import subdirectories
 
 
@@ -27,6 +27,10 @@ class Sequence:
             Instance of ``Lidar`` class.
         """
         return self._lidar
+
+    @property
+    def lidar_raw(self) -> Lidar:
+        return self._lidar_raw
 
     @property
     def camera(self) -> Dict[str, Camera]:
@@ -83,6 +87,7 @@ class Sequence:
     def __init__(self, directory: str) -> None:
         self._directory: str = directory
         self._lidar: Lidar = None
+        self._lidar_raw: Lidar = None
         self._camera: Dict[str, Camera] = None
         self._gps: GPS = None
         self._timestamps: Timestamps = None
@@ -96,6 +101,8 @@ class Sequence:
         for dd in data_directories:
             if dd.endswith('lidar'):
                 self._lidar = Lidar(dd)
+            elif dd.endswith('lidar_raw'):
+                self._lidar_raw = LidarRaw(dd)
             elif dd.endswith('camera'):
                 self._camera = {}
                 camera_directories = subdirectories(dd)

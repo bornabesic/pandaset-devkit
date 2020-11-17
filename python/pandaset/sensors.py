@@ -264,6 +264,17 @@ class Lidar(Sensor):
         return pd.read_pickle(fp)
 
 
+class LidarRaw(Lidar):
+    # 360 mechanical LiDAR
+
+    def __init__(self, directory: str) -> None:
+        super().__init__(directory)
+        self._sensor_id = 0
+
+    @property
+    def data(self) -> List[pd.DataFrame]:
+        pass # TODO
+
 class Camera(Sensor):
     @property
     def _data_file_extension(self) -> str:
