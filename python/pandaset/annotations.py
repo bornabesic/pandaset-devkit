@@ -68,10 +68,26 @@ class Annotation:
         """
         self._load_data()
 
+    def load_single(self, index) -> None:
+        """Loads a single annotation file from disk into memory while
+        other items are set to None.
+
+        All annotation files are traversed in filename order.
+        """
+        self._load_single_data_item(index)
+
     def _load_data(self) -> None:
         self._data = []
         for fp in self._data_structure:
             self._data.append(self._load_data_file(fp))
+
+    def _load_single_data_item(self, index):
+        self._data = []
+        for i, fp in enumerate(self._data_structure):
+            self._data.append(
+                self._load_data_file(fp) if i == index \
+                else None
+            )
 
     @abstractmethod
     def _load_data_file(self, fp: str) -> None:
