@@ -11,5 +11,10 @@ setup(
     packages=['pandaset'],
     python_requires='>=3.6',
     long_description='Pandaset Devkit for Python3',
-    install_requires=requirements
+    install_requires=requirements,
+    entry_points = {
+        "console_scripts": [
+            f"pandaset = pandaset.__main__:main"
+        ]
+    }
 )
