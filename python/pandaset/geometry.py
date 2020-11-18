@@ -51,11 +51,14 @@ def projection(lidar_points, camera_data, camera_pose, camera_intrinsics, filter
 
 
 def lidar_points_to_ego(points, lidar_pose):
+    transform_matrix = to_ego_matrix(lidar_pose)
+    return (transform_matrix[:3, :3] @ points.T +  transform_matrix[:3, [3]]).T
+
+def to_ego_matrix(lidar_pose):
     lidar_pose_mat = _heading_position_to_mat(
         lidar_pose['heading'], lidar_pose['position'])
     transform_matrix = np.linalg.inv(lidar_pose_mat)
-    return (transform_matrix[:3, :3] @ points.T +  transform_matrix[:3, [3]]).T
-
+    return transform_matrix
 
 def center_box_to_corners(box):
     pos_x, pos_y, pos_z, dim_x, dim_y, dim_z, yaw = box
