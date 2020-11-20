@@ -263,6 +263,10 @@ class SemanticSegmentation(Annotation):
         super().load()
         self._load_classes()
 
+    def load_single(self, index) -> None:
+        super().load_single(index)
+        self._load_classes()
+
     def _load_structure(self) -> None:
         super()._load_structure()
         self._load_classes_structure()
