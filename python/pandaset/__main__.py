@@ -37,7 +37,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    data_dir = Path(args.data_dir)
+    data_dir = Path(args.data_dir).resolve()
     sequence_dirs = list(filter(
         lambda p: p.is_dir(),
         data_dir.iterdir()
