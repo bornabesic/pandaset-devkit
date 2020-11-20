@@ -296,7 +296,7 @@ class LidarRaw(Lidar):
         df.rename(columns={"intensity": "i"}, inplace=True)
         df["i"] = df["i"].astype(np.float64)
         df = df.assign(d=0)
-        df = df[["x", "y", "z", "i", "d"]]
+        # df = df[["x", "y", "z", "i", "d"]]
 
         return df
 
