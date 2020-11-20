@@ -45,6 +45,7 @@ def main():
 
     sequence_ids = set(map(lambda seq: seq.name, sequence_dirs))
 
+    exist = set()
     with ZipFile(args.lidar_raw_data_zip, "r") as zip_file:
         lidar_raw_file_paths = list(filter(
             lambda p: Path(p).parent.name in sequence_ids,
@@ -65,14 +66,16 @@ def main():
             poses_filename = "poses.json"
             poses_src = lidar_dir / poses_filename
             poses_dst = lidar_raw_dir / poses_filename
-            if not poses_dst.exists():
+            if poses_dst not in exist:
                 os.symlink(poses_src, poses_dst)
+                exist.add(poses_dst)
 
             timestamps_filename = "timestamps.json"
             timestamps_src = lidar_dir / timestamps_filename
             timestamps_dst = lidar_raw_dir / timestamps_filename
-            if not timestamps_dst.exists():
+            if timestamps_dst not in exist:
                 os.symlink(timestamps_src, timestamps_dst)
+                exist.add(timestamps_dst)
 
     print(len(lidar_raw_file_paths), "raw LiDAR scans merged.")
 
